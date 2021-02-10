@@ -69,7 +69,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         smsManager = SmsManager.getDefault();
 
-        smsResult = new SmsBroadCastReceiver();
+        registerBrodcaster();
 //        sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
 
         // getAttendance(null);
@@ -240,7 +240,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         String msgText = "";
 
-        String st1 = "OXFORD School Baka Khel\n";
+        String st1 = "(%s)\n\nOXFORD School Baka Khel";
 
         String st2 = "%s طالب علم\n" +
                 "سکول میں داخل ہوچکاہے";
@@ -248,11 +248,13 @@ public class SmsSenderActivity extends AppCompatActivity {
                 "سکول سے نکل چکاہے";
 
         tempAttendance = attendancesCopy.get(0);
+        String[] fArray = tempAttendance.EntranceTime.split(":");
+        String[] sArray = tempAttendance.LeaveTime.split(":");
 
         if (time == 0) {
-            msgText = st1 + String.format(st2, tempAttendance.Name);
+            msgText = String.format(st2, tempAttendance.Name) + String.format(st1, fArray[0] + ":" + fArray[1]);
         } else {
-            msgText = st1 + String.format(st3, tempAttendance.Name);
+            msgText = st1 + String.format(st3, tempAttendance.Name) + String.format(st1, sArray[0] + ":" + sArray[1]);
         }
 
         PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", tempAttendance.AttId), 0);
