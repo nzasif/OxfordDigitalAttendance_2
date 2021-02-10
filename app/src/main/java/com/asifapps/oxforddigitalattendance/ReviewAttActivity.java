@@ -27,6 +27,7 @@ public class ReviewAttActivity extends AppCompatActivity {
     String attStatus;
 
     TextView stdAttName;
+    TextView currentAttStatus;
 
     RadioButton a;
     RadioButton l;
@@ -42,6 +43,7 @@ public class ReviewAttActivity extends AppCompatActivity {
         p = findViewById(R.id.p);
 
         stdAttName = findViewById(R.id.stdAttName);
+        currentAttStatus = findViewById(R.id.attReviewStatus);
 
         attId = getIntent().getIntExtra("attId", 0);
         name = getIntent().getStringExtra("name");
@@ -49,23 +51,23 @@ public class ReviewAttActivity extends AppCompatActivity {
         attStatus = getIntent().getStringExtra("attStatus");
 
         stdAttName.setText(name);
-        setRadios(attStatus);
+        setAttStatus(attStatus);
 
         getAtt();
     }
 
-    private void  setRadios(String attStatus) {
+    private void  setAttStatus(String attStatus) {
 
         // Check which radio button was clicked
         switch(attStatus) {
             case "A":
-                a.setActivated(true);
+                currentAttStatus.setText("Absent");
                 break;
             case "P":
-                p.setActivated(true);
+                currentAttStatus.setText("Present");
                 break;
             case "L":
-                l.setActivated(true);
+                currentAttStatus.setText("Leave");
                 break;
         }
     }
