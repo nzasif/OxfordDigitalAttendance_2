@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10sp">
+
+    <TextView
+        android:id="@+id/rnoText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="1sp"
+        android:layout_weight="1"
+        android:background="#444444"
+        android:clickable="true"
+        android:padding="5sp"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#000D57"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/nameText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="1sp"
+        android:layout_weight="5"
+        android:background="#F0F6FF"
+        android:clickable="true"
+        android:padding="5sp"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColorLink="#000D57"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/phoneText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="1sp"
+        android:layout_weight="5"
+        android:background="#F0F6FF"
+        android:clickable="true"
+        android:padding="5sp"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColorLink="#000D57"
+        android:textSize="14sp"
+        android:textStyle="italic" />
+
+    <ImageButton
+        android:id="@+id/del"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:cropToPadding="false"
+        app:srcCompat="@android:drawable/ic_menu_delete" />
+
+    <ImageButton
+        android:id="@+id/edit"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:layout_weight="1"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
+</LinearLayout>

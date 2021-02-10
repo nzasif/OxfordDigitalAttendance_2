@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/addNew"
+        android:title="Add New Student" />
+    <item
+        android:id="@+id/stdListView"
+        android:title="Students List" />
+    <item
+        android:id="@+id/cardScanner"
+        android:title="Card Scanner" />
+    <item
+        android:id="@+id/viewAtt"
+        android:title="Attendance" />
+    <item
+        android:id="@+id/stdEntry"
+        android:title="Card Entry" />
+    <item
+        android:id="@+id/sendSms"
+        android:title="Send Sms" />
+    <item
+        android:id="@+id/logout"
+        android:title="Logout" />
+</menu>

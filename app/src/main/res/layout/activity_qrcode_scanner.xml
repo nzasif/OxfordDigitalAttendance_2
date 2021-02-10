@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".QRCodeScannerActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioGroup
+            android:id="@+id/attTimeRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5sp">
+
+            <RadioButton
+                android:id="@+id/firstTimeRadio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="First Time"
+                android:onClick="onRadioButtonClicked"/>
+
+            <Space
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:id="@+id/secTimeRadio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Second Time"
+                android:onClick="onRadioButtonClicked"/>
+        </RadioGroup>
+
+        <com.journeyapps.barcodescanner.DecoratedBarcodeView
+            android:id="@+id/barcode_scanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.journeyapps.barcodescanner.DecoratedBarcodeView>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
