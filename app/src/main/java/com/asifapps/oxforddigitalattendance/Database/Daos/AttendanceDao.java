@@ -51,7 +51,7 @@ public interface AttendanceDao {
     @Update
     public void updateAttendance(Attendance attendance);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     public void updateAttendances(List<Attendance> attendance);
 
     @Delete

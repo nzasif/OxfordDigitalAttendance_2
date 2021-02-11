@@ -145,6 +145,7 @@ public class ReviewAttActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(), "updated ", Toast.LENGTH_LONG).show();
+                        setAttStatus(attStatus);
                     }
                 });
             }

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,14 +48,16 @@ public class SmsSenderActivity extends AppCompatActivity {
     String DELIVERED = "SMS_DELIVERED";
 
     TextView smsCounterText;
-
+    Button fTimeSmsBtn;
+    Button sTimeSmsBtn;
     ProgressBar progressBar;
 
     int totalMessagesToSent;
 
     Attendance tempAttendance;
-    int tempMsgSize;
     int msgSize;
+
+    int smsCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +73,8 @@ public class SmsSenderActivity extends AppCompatActivity {
         attendanceDao = db.attendanceDao();
         attendances = new ArrayList<>();
 
-        smsManager = SmsManager.getDefault();
+        sTimeSmsBtn = findViewById(R.id.sTimeSmsBtn);
+        fTimeSmsBtn = findViewById(R.id.fTimeSmsBtn);
 
         //registerBrodcaster();
 //        sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
@@ -92,6 +96,8 @@ public class SmsSenderActivity extends AppCompatActivity {
 
     public void getAttendance() {
         progressBar.setVisibility(View.VISIBLE);
+        fTimeSmsBtn.setClickable(false);
+        sTimeSmsBtn.setClickable(false);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -114,6 +120,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        smsCounterText.setText("Pending messages: " + totalMessagesToSent);
                         sendSMS2();
                         //Toast.makeText(getApplicationContext(), String.valueOf(attendancesCopy.size()), Toast.LENGTH_LONG).show();
                     }
@@ -121,8 +128,6 @@ public class SmsSenderActivity extends AppCompatActivity {
             }
         }.execute();
     }
-
-    int smsCounter = 0;
 
     public void sendNextMsg() {
 
@@ -195,27 +200,23 @@ public class SmsSenderActivity extends AppCompatActivity {
                 // int index = intent.getIntExtra("index", -1);
                 int resultCode = getResultCode();
 
-                tempMsgSize--;
-
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        // if this the last intent sent by smsManager
-                        if (tempMsgSize == 0) {
-                            Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
-                            if (time == 0) {
-                                tempAttendance.EntranceMsgSent = true;
-                            } else {
-                                tempAttendance.LeaveMsgSent = true;
-                            }
-
-                            attendances.add(tempAttendance);
-                            smsCounter++;
-                            sendSMS2();
+                        Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_SHORT).show();
+                        if (time == 0) {
+                            tempAttendance.EntranceMsgSent = true;
+                        } else {
+                            tempAttendance.LeaveMsgSent = true;
                         }
+
+                        attendances.add(tempAttendance);
+                        smsCounter++;
+                        sendSMS2();
+
                         break;
                         default:
                             sendSMS2();
-                            Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "failed try again.", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -225,7 +226,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
     private void sendSMS2() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(210);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -236,6 +237,8 @@ public class SmsSenderActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Message Sending process completed; total " + smsCounter + " messages sent", Toast.LENGTH_LONG).show();
             smsCounterText.setText("Message Sending process completed; total " + smsCounter + "/" + totalMessagesToSent + " messages sent ");
             progressBar.setVisibility(View.INVISIBLE);
+            fTimeSmsBtn.setClickable(true);
+            sTimeSmsBtn.setClickable(true);
 
             if (attendances.size() != 0) {
                 updateSmsStatus();
@@ -265,7 +268,6 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         ArrayList<String> msgParts = sms.divideMessage(msgText);
         msgSize = msgParts.size();
-        tempMsgSize = msgParts.size();
 
         ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
 
