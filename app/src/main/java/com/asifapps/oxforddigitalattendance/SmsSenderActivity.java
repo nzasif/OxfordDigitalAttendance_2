@@ -98,6 +98,7 @@ public class SmsSenderActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         fTimeSmsBtn.setClickable(false);
         sTimeSmsBtn.setClickable(false);
+        smsCounter = 0;
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -234,8 +235,8 @@ public class SmsSenderActivity extends AppCompatActivity {
         int size = attendancesCopy.size();
 
         if (size == 0) {
-            Toast.makeText(getApplicationContext(), "Message Sending process completed; total " + smsCounter + " messages sent", Toast.LENGTH_LONG).show();
-            smsCounterText.setText("Message Sending process completed; total " + smsCounter + "/" + totalMessagesToSent + " messages sent ");
+            // Toast.makeText(getApplicationContext(), "Message Sending process completed; " + smsCounter + " messages sent", Toast.LENGTH_LONG).show();
+            smsCounterText.setText("Message Sending process completed; " + smsCounter + "/" + totalMessagesToSent + " messages sent ");
             progressBar.setVisibility(View.INVISIBLE);
             fTimeSmsBtn.setClickable(true);
             sTimeSmsBtn.setClickable(true);
@@ -249,7 +250,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         String msgText = "";
 
-        String st1 = "\nTime: (%s)\n\nOXFORD School & College Baka Khel";
+        String st1 = "\nTime: (%s)\n\nOXFORD School & College\nBaka Khel Bannu";
 
         String st2 = "%s طالب علم\n" +
                 "سکول میں داخل ہوچکاہے۔";
