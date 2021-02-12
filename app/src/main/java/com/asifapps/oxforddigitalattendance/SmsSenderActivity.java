@@ -52,12 +52,13 @@ public class SmsSenderActivity extends AppCompatActivity {
     Button sTimeSmsBtn;
     ProgressBar progressBar;
 
-    int totalMessagesToSent;
+    int totalMessagesToSent = 0;
+    int leftMessages = 0;
+
+    int sentSmsCounter = 0;
 
     Attendance tempAttendance;
     int msgSize;
-
-    int smsCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +96,6 @@ public class SmsSenderActivity extends AppCompatActivity {
     }
 
     public void getAttendance() {
-        progressBar.setVisibility(View.VISIBLE);
-        fTimeSmsBtn.setClickable(false);
-        sTimeSmsBtn.setClickable(false);
-        smsCounter = 0;
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -110,7 +107,6 @@ public class SmsSenderActivity extends AppCompatActivity {
 
                 attendancesCopy = attendanceDao.getSecondTimeAttendancesWithStatus(currentDate, attStatus, msgStatus);
                 return null;
-
             }
 
             @Override
@@ -118,9 +114,19 @@ public class SmsSenderActivity extends AppCompatActivity {
                 super.onPostExecute(aVoid);
 
                 totalMessagesToSent = attendancesCopy.size();
+                leftMessages = totalMessagesToSent;
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (leftMessages > 0) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            fTimeSmsBtn.setClickable(false);
+                            sTimeSmsBtn.setClickable(false);
+
+                            sentSmsCounter = 0;
+                        }
+
                         smsCounterText.setText("Pending messages: " + totalMessagesToSent);
                         sendSMS2();
                         //Toast.makeText(getApplicationContext(), String.valueOf(attendancesCopy.size()), Toast.LENGTH_LONG).show();
@@ -130,47 +136,47 @@ public class SmsSenderActivity extends AppCompatActivity {
         }.execute();
     }
 
-    public void sendNextMsg() {
-
-        int size = attendancesCopy.size();
-
-        if (size == 0) {
-            Toast.makeText(getApplicationContext(), "size is 0", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        smsCounter++;
-        smsCounterText.setText(Integer.toString(smsCounter));
-
-        String msgText = "";
-
-        String st1 = "OXFORD School & College Bakak Khel\n";
-
-        String st2 = "%s  طالب علم\n" +
-                "سکول میں داخل ہوچکا ہے۔";
-        String st3 = "%s  طالب علم\n" +
-                "سکول سے نکل چکا ہے۔";
-
-        Attendance attendance = attendancesCopy.get(0);
-
-        if (time == 0) {
-            msgText = st1 + String.format(st2, attendance.Name);
-        } else {
-            msgText = st1 + String.format(st3, attendance.Name);
-        }
-
-        // STEP-1___
-        // SEND PendingIntent
-        String SENT = "SMS_SENT";
-        String DELIVERED = "SMS_DELIVERED";
-
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", attendance.AttId), 0);
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
-
-        smsManager.sendTextMessage(attendance.Phone, null, msgText, sentPI,deliveredPI);
-
-        attendancesCopy.remove(0);
-    }
+//    public void sendNextMsg() {
+//
+//        int size = attendancesCopy.size();
+//
+//        if (size == 0) {
+//            Toast.makeText(getApplicationContext(), "size is 0", Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//
+//        smsCounter++;
+//        smsCounterText.setText(Integer.toString(smsCounter));
+//
+//        String msgText = "";
+//
+//        String st1 = "OXFORD School & College Bakak Khel\n";
+//
+//        String st2 = "%s  طالب علم\n" +
+//                "سکول میں داخل ہوچکا ہے۔";
+//        String st3 = "%s  طالب علم\n" +
+//                "سکول سے نکل چکا ہے۔";
+//
+//        Attendance attendance = attendancesCopy.get(0);
+//
+//        if (time == 0) {
+//            msgText = st1 + String.format(st2, attendance.Name);
+//        } else {
+//            msgText = st1 + String.format(st3, attendance.Name);
+//        }
+//
+//        // STEP-1___
+//        // SEND PendingIntent
+//        String SENT = "SMS_SENT";
+//        String DELIVERED = "SMS_DELIVERED";
+//
+//        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", attendance.AttId), 0);
+//        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+//
+//        smsManager.sendTextMessage(attendance.Phone, null, msgText, sentPI,deliveredPI);
+//
+//        attendancesCopy.remove(0);
+//    }
 
     private void updateSmsStatus() {
         new AsyncTask<Void, Void, Void>() {
@@ -201,9 +207,31 @@ public class SmsSenderActivity extends AppCompatActivity {
                 // int index = intent.getIntExtra("index", -1);
                 int resultCode = getResultCode();
 
+                msgSize--;
+
                 switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_SHORT).show();
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        Toast.makeText(getApplicationContext(), "Network error, try again.", Toast.LENGTH_LONG).show();
+                        messageSendingProcessCompleted();
+                        leftMessages = 0;
+                        msgSize = 0;
+                        attendancesCopy.clear();
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        msgSize = 0;
+                        // if phone no is wrong then try on next one;
+                        break;
+                }
+
+                if (msgSize <= 0) {
+
+                    leftMessages--;
+
+                    if (resultCode == Activity.RESULT_OK) {
+                        Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_LONG).show();
+
                         if (time == 0) {
                             tempAttendance.EntranceMsgSent = true;
                         } else {
@@ -211,13 +239,19 @@ public class SmsSenderActivity extends AppCompatActivity {
                         }
 
                         attendances.add(tempAttendance);
-                        smsCounter++;
-                        sendSMS2();
+                        sentSmsCounter++;
+                    }
 
-                        break;
-                        default:
-                            sendSMS2();
-                            Toast.makeText(getApplicationContext(), "failed try again.", Toast.LENGTH_SHORT).show();
+                    if (resultCode != Activity.RESULT_OK ) {
+                        Toast.makeText(getApplicationContext(), "failed!", Toast.LENGTH_LONG).show();
+                    }
+
+                    if (leftMessages <= 0) {
+                        messageSendingProcessCompleted();
+                    } else {
+                        sendSMS2();
+                    }
+
                 }
             }
         };
@@ -227,24 +261,14 @@ public class SmsSenderActivity extends AppCompatActivity {
 
     private void sendSMS2() {
         try {
-            Thread.sleep(210);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         int size = attendancesCopy.size();
 
         if (size == 0) {
-            // Toast.makeText(getApplicationContext(), "Message Sending process completed; " + smsCounter + " messages sent", Toast.LENGTH_LONG).show();
-            smsCounterText.setText("Message Sending process completed; " + smsCounter + "/" + totalMessagesToSent + " messages sent ");
-            progressBar.setVisibility(View.INVISIBLE);
-            fTimeSmsBtn.setClickable(true);
-            sTimeSmsBtn.setClickable(true);
-
-            if (attendances.size() != 0) {
-                updateSmsStatus();
-            }
-
             return;
         }
 
@@ -258,6 +282,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                 "سکول سے نکل چکاہے۔";
 
         tempAttendance = attendancesCopy.get(0);
+        attendancesCopy.remove(0);
 
         if (time == 0) {
             msgText = String.format(st2, tempAttendance.Name) + String.format(st1, tempAttendance.EntranceTime);
@@ -286,8 +311,18 @@ public class SmsSenderActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
 
-        attendancesCopy.remove(0);
+    private void messageSendingProcessCompleted() {
+        // Toast.makeText(getApplicationContext(), "Message Sending process completed; " + smsCounter + " messages sent", Toast.LENGTH_LONG).show();
+        smsCounterText.setText("Message Sending process completed; " + sentSmsCounter + "/" + totalMessagesToSent + " messages sent ");
+        progressBar.setVisibility(View.INVISIBLE);
+        fTimeSmsBtn.setClickable(true);
+        sTimeSmsBtn.setClickable(true);
+
+        if (attendances.size() != 0) {
+            updateSmsStatus();
+        }
     }
 
     @Override
