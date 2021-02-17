@@ -114,7 +114,8 @@
                 android:layout_weight="1"
                 android:onClick="sendToAllFirstTimeMsg"
                 android:text="Send to all (1st Time Msg)"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:visibility="invisible" />
 
             <Button
                 android:id="@+id/secMsgBtn"
@@ -123,7 +124,8 @@
                 android:layout_weight="1"
                 android:onClick="sendToAllSecondTimeMsg"
                 android:text="Send to all (2nd Time Msg)"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:visibility="invisible" />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView

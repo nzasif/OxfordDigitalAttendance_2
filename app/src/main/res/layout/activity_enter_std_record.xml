@@ -6,14 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".EnterStdRecordActivity">
 
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
-        android:id="@+id/card_entry_scanner"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5sp"
+            android:checked="false"
+            android:onClick="selectOld10th"
+            android:text="Old 10th" />
+
+        <com.journeyapps.barcodescanner.DecoratedBarcodeView
+            android:id="@+id/card_entry_scanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.journeyapps.barcodescanner.DecoratedBarcodeView>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

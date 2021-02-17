@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.asifapps.oxforddigitalattendance.Database.AppDb;
@@ -43,6 +44,8 @@ public class EnterStdRecordActivity extends AppCompatActivity {
     private StudentDao studentDao;
 
     MediaPlayer mediaPlayer = new MediaPlayer();
+
+    boolean isOld10th = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +101,14 @@ public class EnterStdRecordActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                Student studentDup = studentDao.getStudent(rno, cl);
+
+                String _cl = cl;
+
+                if (isOld10th) {
+                    _cl = "old10th";
+                }
+
+                Student studentDup = studentDao.getStudent(rno, _cl);
 
                 if (studentDup != null) {
                     return null;
@@ -109,7 +119,7 @@ public class EnterStdRecordActivity extends AppCompatActivity {
                 student.Name = name;
                 student.Rno = rno;
                 student.Phone = p;
-                student.Class = cl;
+                student.Class = _cl;
                 student.FatherName = fn;
 
                 studentDao.insertStudent(student);
@@ -124,6 +134,10 @@ public class EnterStdRecordActivity extends AppCompatActivity {
     public void playBeep() {
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep2);
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
+    }
+
+    public void selectOld10th(View view) {
+        isOld10th = ((Switch) view).isChecked();
     }
 
     @Override

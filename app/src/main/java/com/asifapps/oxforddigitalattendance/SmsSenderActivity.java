@@ -207,6 +207,52 @@ public class SmsSenderActivity extends AppCompatActivity {
                 // int index = intent.getIntExtra("index", -1);
                 int resultCode = getResultCode();
 
+                leftMessages--;
+
+                switch (resultCode) {
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        Toast.makeText(getApplicationContext(), "Network error, try again.", Toast.LENGTH_LONG).show();
+                        leftMessages = 0;
+                        attendancesCopy.clear();
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        // if phone no is wrong then try on next one;
+                        break;
+                }
+
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_LONG).show();
+
+                    if (time == 0) {
+                        tempAttendance.EntranceMsgSent = true;
+                    } else {
+                        tempAttendance.LeaveMsgSent = true;
+                    }
+
+                    attendances.add(tempAttendance);
+                    sentSmsCounter++;
+                }
+
+                if (leftMessages <= 0) {
+                    messageSendingProcessCompleted();
+                } else {
+                    sendSMS2();
+                }
+            }
+        };
+
+        getBaseContext().registerReceiver(smsResult, new IntentFilter(SENT));
+    }
+
+    private void registerBrodcaster2() {
+        smsResult = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // int index = intent.getIntExtra("index", -1);
+                int resultCode = getResultCode();
+
                 msgSize--;
 
                 switch (resultCode) {
@@ -214,7 +260,6 @@ public class SmsSenderActivity extends AppCompatActivity {
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
                         Toast.makeText(getApplicationContext(), "Network error, try again.", Toast.LENGTH_LONG).show();
-                        messageSendingProcessCompleted();
                         leftMessages = 0;
                         msgSize = 0;
                         attendancesCopy.clear();
@@ -269,17 +314,16 @@ public class SmsSenderActivity extends AppCompatActivity {
         int size = attendancesCopy.size();
 
         if (size == 0) {
+            messageSendingProcessCompleted();
             return;
         }
 
         String msgText = "";
 
-        String st1 = "\nTime: (%s)\n\nOXFORD School & College\nBaka Khel Bannu";
+        String st1 = "\nTime: (%s)\n\nThis message has been sent from OXFORD digital attendance system";
 
-        String st2 = "%s طالب علم\n" +
-                "سکول میں داخل ہوچکاہے۔";
-        String st3 = "%s طالب علم\n" +
-                "سکول سے نکل چکاہے۔";
+        String st2 = "Student %s has entered into the school.";
+        String st3 = "Student %s has left for home.";
 
         tempAttendance = attendancesCopy.get(0);
         attendancesCopy.remove(0);
@@ -292,22 +336,22 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         SmsManager sms = SmsManager.getDefault();
 
-        ArrayList<String> msgParts = sms.divideMessage(msgText);
-        msgSize = msgParts.size();
+        // ArrayList<String> msgParts = sms.divideMessage(msgText);
+        // msgSize = msgParts.size();
 
-        ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            PendingIntent pi = PendingIntent.getBroadcast(this, i, new Intent(SENT), 0);
-            pendingIntents.add(pi);
-        }
-
-//        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", tempAttendance.AttId), 0);
-//        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+//        ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
+//
+//        for (int i = 0; i < size; i++) {
+//            PendingIntent pi = PendingIntent.getBroadcast(this, i, new Intent(SENT), 0);
+//            pendingIntents.add(pi);
+//        }
+//
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", tempAttendance.AttId), 0);
+//      PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
 
         try {
-            // sms.sendTextMessage(tempAttendance.Phone, null, msgText, sentPI, deliveredPI);
-            sms.sendMultipartTextMessage(tempAttendance.Phone, "", msgParts, pendingIntents, null);
+             sms.sendTextMessage(tempAttendance.Phone, null, msgText, sentPI, null);
+            // sms.sendMultipartTextMessage(tempAttendance.Phone, "", msgParts, pendingIntents, null);
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }

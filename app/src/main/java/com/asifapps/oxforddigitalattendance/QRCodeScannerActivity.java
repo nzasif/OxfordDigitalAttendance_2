@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.asifapps.oxforddigitalattendance.Database.AppDb;
@@ -60,6 +61,8 @@ public class QRCodeScannerActivity extends AppCompatActivity {
     private Attendance attendance;
 
     private int time = 0;
+
+    boolean isOld10th = false;
 
     private BarcodeCallback callback = new BarcodeCallback() {
 
@@ -132,11 +135,20 @@ public class QRCodeScannerActivity extends AppCompatActivity {
         }
     }
 
-    private void takeAtt(final String rno, final String _cl) {
+    public void selectOld10th(View view) {
+        isOld10th = ((Switch) view).isChecked();
+    }
+
+    private void takeAtt(final String rno, final String cl) {
 
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
+                String _cl = cl;
+
+                if (isOld10th) {
+                    _cl = "old10th";
+                }
 
                 if (time == 0) {
                     attendance = attendanceDao.getFirstAttendance(rno, _cl, DateTimeHelper.GetCurrentDate());

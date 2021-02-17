@@ -123,7 +123,7 @@ public class ViewAttActivity extends AppCompatActivity
     private void setClassSpinner() {
         Spinner sp = (Spinner) findViewById(R.id._classesDropdown);
 
-        classes = new String[]{"Prep", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"};
+        classes = new String[]{"Prep", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "old10th"};
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.dropdown_item, classes);
 
@@ -211,10 +211,10 @@ public class ViewAttActivity extends AppCompatActivity
     }
 
     private void setAttRecyclerViewAdapter() {
-        if (attendances.size() > 0)
-            setSendToAllContainerVisibility(true);
-        else
-            setSendToAllContainerVisibility(false);
+//        if (attendances.size() > 0)
+//            setSendToAllContainerVisibility(true);
+//        else
+//            setSendToAllContainerVisibility(false);
 
         attRecyclerViewAdapter = new AttRecyclerViewAdapter(this, attendances);
         resView.setAdapter(attRecyclerViewAdapter);
