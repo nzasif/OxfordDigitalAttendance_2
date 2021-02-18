@@ -320,10 +320,12 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         String msgText = "";
 
-        String st1 = "\nTime: (%s)\n\nThis message has been sent from OXFORD digital attendance system";
+        String st1 = "\nTime: (%s) \nDate: (" + tempAttendance.AttDate + ")" +
+                "\n\nThis message has been sent from OXFORD digital attendance system\n" +
+                "Developed by: Asif Nawaz Khan";
 
-        String st2 = "Student %s has entered into the school.";
-        String st3 = "Student %s has left for home.";
+        String st2 = "Student \"%s\" has entered into the school.";
+        String st3 = "Student \"%s\" has left for home.";
 
         tempAttendance = attendancesCopy.get(0);
         attendancesCopy.remove(0);

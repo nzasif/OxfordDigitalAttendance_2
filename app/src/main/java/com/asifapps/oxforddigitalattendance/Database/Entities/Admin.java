@@ -9,4 +9,6 @@ public class Admin {
     public int AdminId;
     public String UserName;
     public String Password;
+
+    public int passwordUsage;
 }

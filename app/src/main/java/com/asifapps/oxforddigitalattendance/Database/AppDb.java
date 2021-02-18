@@ -7,10 +7,10 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.asifapps.oxforddigitalattendance.Database.Daos.AttendanceDao;
+import com.asifapps.oxforddigitalattendance.Database.Daos.LoginDao;
 import com.asifapps.oxforddigitalattendance.Database.Daos.StudentDao;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Admin;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Attendance;
-import com.asifapps.oxforddigitalattendance.Database.Entities.Converters;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Student;
 
 import java.util.concurrent.ExecutorService;
@@ -18,12 +18,13 @@ import java.util.concurrent.Executors;
 
 @Database(
         entities = { Student.class, Attendance.class, Admin.class},
-        version = 4, exportSchema = false)
+        version = 5, exportSchema = false)
 @TypeConverters({Converters.class})
 
 public abstract class AppDb extends RoomDatabase {
     public abstract StudentDao studentDao();
     public abstract AttendanceDao attendanceDao();
+    public abstract LoginDao loginDao();
     // public abstract Admin adminDao();
 
     private static volatile AppDb INSTANCE;
@@ -36,7 +37,7 @@ public abstract class AppDb extends RoomDatabase {
             synchronized (AppDb.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDb.class, "mydb11")
+                            AppDb.class, "mydb12")
                             .build();
                 }
             }

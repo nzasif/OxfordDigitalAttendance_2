@@ -113,7 +113,8 @@ public class QRCodeScannerActivity extends AppCompatActivity {
         AppDb db = AppDb.getDatabase(this);
         attendanceDao = db.attendanceDao();
         studentDao = db.studentDao();
-        // registerBroadCastReceiver();
+
+        currentDate = DateTimeHelper.GetCurrentDate();
     }
 
     public void onRadioButtonClicked(View view) {
@@ -151,40 +152,26 @@ public class QRCodeScannerActivity extends AppCompatActivity {
                 }
 
                 if (time == 0) {
-                    attendance = attendanceDao.getFirstAttendance(rno, _cl, DateTimeHelper.GetCurrentDate());
+                    attendance = attendanceDao.getFirstAttendance(rno, _cl, currentDate);
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
-                        attendance.EntranceTime = DateTimeHelper.GetCurrentTime();
+                        attendance.EntranceTime = currentDate;
 
                         attendanceDao.updateAttendance(attendance);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                // sendMsg(attendance.Name, attendance.AttId, "", attendance.Phone );
-                            }
-                        });
 
                         playBeep();
                     }
 
                 } else {
-                    attendance = attendanceDao.getSecondAttendance(rno, _cl, DateTimeHelper.GetCurrentDate());
+                    attendance = attendanceDao.getSecondAttendance(rno, _cl, currentDate);
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
-                        attendance.LeaveTime = DateTimeHelper.GetCurrentTime();
+                        attendance.LeaveTime = currentDate;
 
                         attendanceDao.updateAttendance(attendance);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
 
-                                // sendMsg(attendance.Name, attendance.AttId, "", attendance.Phone );
-                            }
-                        });
                         playBeep();
                     }
                 }
@@ -204,45 +191,6 @@ public class QRCodeScannerActivity extends AppCompatActivity {
         super.onResume();
 
         barcodeView.resume();
-    }
-
-    public void sendMsg(String name, final Integer attId, String _class, String phone) {
-
-        String msgText = "";
-
-        String st1 = "\n\n OXFORD School Baka Khel ";
-
-        String st2 = "%s  طالب علم\n" +
-                "سکول میں داخل ہوچکا ہے۔";
-        String st3 = "%s  طالب علم\n" +
-                "سکول سے نکل چکا ہے۔ وقت: s%";
-
-        if (time == 0) {
-            msgText =  String.format(st2, name) + st1;
-        } else {
-            msgText = String.format(st3, name) + st1;
-        }
-
-        Toast.makeText(this, "sneding...", Toast.LENGTH_LONG).show();
-
-        SmsManager.getDefault().sendTextMessage(phone, null, msgText, null,null);
-    }
-
-    private void updateSmsStatus(final Integer attId, final Integer t) {
-        if (attId == 0) {
-            return;
-        }
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                if (t == 0)
-                    attendanceDao.upadateEntranceMsgSent(attId, true);
-                else
-                    attendanceDao.upadateLeaveMsgSent(attId, true);
-                return null;
-            }
-        }.execute();
     }
 
     @Override

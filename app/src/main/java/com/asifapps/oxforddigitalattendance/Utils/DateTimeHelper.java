@@ -16,6 +16,18 @@ public class DateTimeHelper {
         return Integer.toString(y) + "-" + Integer.toString(m) + "-" + Integer.toString(d);
     }
 
+    public static Integer GetCurrentMonth() {
+        Calendar c = Calendar.getInstance();
+
+        return c.get(Calendar.MONTH)+1;
+    }
+
+    public static Integer GetCurrentYear() {
+        Calendar c = Calendar.getInstance();
+
+        return c.get(Calendar.YEAR);
+    }
+
     public static String GetCurrentDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss", Locale.getDefault());
         String currentDateTime = sdf.format(new Date());

@@ -59,20 +59,8 @@ public class ViewAttActivity extends AppCompatActivity
 
     TextView attDate;
     RecyclerView resView;
-    LinearLayout sendToAllContainer;
-    Button secMsgBtn;
-    Button firstMsgBtn;
-
-    Integer firstSmsCounter = 0;
-    Integer secTimeSmsCounter = 0;
-
-    // store broadCatRecivers for unregistering
-    BroadcastReceiver smsBroadCast;
-    Integer intentCounter = 0;
 
     boolean isFirstTime = true;
-
-    SmsManager smsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +73,6 @@ public class ViewAttActivity extends AppCompatActivity
 
         setClassSpinner();
         attDate = (TextView)findViewById(R.id.attDate);
-        sendToAllContainer = findViewById(R.id.sendToAllContainer);
-        secMsgBtn = findViewById(R.id.secMsgBtn);
-        firstMsgBtn = findViewById(R.id.firstMsgBtn);
-
-        sendToAllContainer.setVisibility(View.INVISIBLE);
 
         resView = (RecyclerView)findViewById(R.id.attRecyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -98,10 +81,6 @@ public class ViewAttActivity extends AppCompatActivity
         attendances = new ArrayList<>();
 
         setAttRecyclerViewAdapter();
-
-        smsManager = SmsManager.getDefault();
-
-        smsBroadCast = new smsBroadCastet();
 
         try {
             String _cl = savedInstanceState.getString("Class");
@@ -211,11 +190,6 @@ public class ViewAttActivity extends AppCompatActivity
     }
 
     private void setAttRecyclerViewAdapter() {
-//        if (attendances.size() > 0)
-//            setSendToAllContainerVisibility(true);
-//        else
-//            setSendToAllContainerVisibility(false);
-
         attRecyclerViewAdapter = new AttRecyclerViewAdapter(this, attendances);
         resView.setAdapter(attRecyclerViewAdapter);
     }
@@ -288,138 +262,5 @@ public class ViewAttActivity extends AppCompatActivity
         savedInstanceState.putString("Class", _class);
         savedInstanceState.putString("attStatus", attStatus);
         savedInstanceState.putString("date", date);
-    }
-
-    public void sendToAllFirstTimeMsg(View view) {
-        if(AttendanceHelper.isMsgSentToAll(attendances, Constants.fTime)) {
-            Toast.makeText(this, "Already sent to all", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        firstMsgBtn.setClickable(false);
-        firstMsgBtn.setText("Sending...");
-
-        registerReceiver(smsBroadCast, new IntentFilter(intentFilter));
-
-        isFirstTime = true;
-
-        sendMsg();
-    }
-
-    public void sendToAllSecondTimeMsg(View view) {
-        if(AttendanceHelper.isMsgSentToAll(attendances, Constants.sTime)) {
-            Toast.makeText(this, "Already sent to all", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        secMsgBtn.setClickable(false);
-        secMsgBtn.setText("Sending...");
-
-        for(Attendance attendance: attendances) {
-            if (attendance.LeaveMsgSent) {
-                continue;
-            }
-
-            // sendMsg(attendance, Constants.sTime);
-        }
-    }
-
-
-    String intentFilter = "SMS_SENT1";
-//    final Attendance attendance, Integer time
-    public void sendMsg() {
-
-//        if (time.equals(Constants.fTime)) {
-//            firstSmsCounter++;
-//        } else {
-//            secTimeSmsCounter++;
-//        }
-
-        if (attendancesCopy.size() == 0) {
-            return;
-        }
-
-        String msgText = "";
-
-        String st1 = "\n\n\nOXFORD School Bakak Khel ";
-
-        String st2 = "%s  طالب علم\n" +
-                "سکول میں داخل ہوچکا ہے۔";
-        String st3 = "%s  طالب علم\n" +
-                "سکول سے نکل چکا ہے۔";
-        Attendance attendance = attendancesCopy.get(0);
-
-        if (isFirstTime) {
-            msgText =  String.format(st2, attendance.Name) + st1;
-        } else {
-            msgText = String.format(st3, attendance.Name) + st1;
-        }
-
-        Integer index = attendances.indexOf(attendance);
-
-        // STEP-1___
-        // SEND PendingIntent
-        int requestCode = attendancesCopy.size();
-
-        Intent smsIntent = new Intent(intentFilter);
-//
-//        smsIntent.putExtra("time", time);
-        smsIntent.putExtra("attId", attendance.AttId);
-        smsIntent.putExtra("index", index);
-
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, requestCode, smsIntent, PendingIntent.FLAG_ONE_SHOT);
-        // STEP-2___
-        // SEND BroadcastReceiver
-        smsManager.sendTextMessage(attendance.Phone, "Oxford", msgText, sentPI,null);
-
-        attendancesCopy.remove(0);
-    }
-
-    private class smsBroadCastet extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-         Toast.makeText(context, "woooo", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        registerReceiver(smsBroadCast, new IntentFilter(intentFilter));
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        unregisterReceiver(smsBroadCast);
-    }
-
-    private void updateSmsStatus(final Integer attId) {
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-                if (isFirstTime)
-                {
-                    attendanceDao.upadateEntranceMsgSent(attId, true);
-                }
-                else {
-                    attendanceDao.upadateLeaveMsgSent(attId, true);
-                }
-
-                return null;
-            }
-        }.execute();
-    }
-
-    private void setSendToAllContainerVisibility(boolean visibility) {
-        if (visibility && attStatus == Constants.pesent && date.equals(DateTimeHelper.GetCurrentDate())) {
-            sendToAllContainer.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        sendToAllContainer.setVisibility(View.INVISIBLE);
     }
 }
