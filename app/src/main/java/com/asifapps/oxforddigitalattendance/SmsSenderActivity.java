@@ -77,7 +77,7 @@ public class SmsSenderActivity extends AppCompatActivity {
         sTimeSmsBtn = findViewById(R.id.sTimeSmsBtn);
         fTimeSmsBtn = findViewById(R.id.fTimeSmsBtn);
 
-        //registerBrodcaster();
+        registerBrodcaster();
 //        sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
 
         // getAttendance(null);
@@ -101,11 +101,13 @@ public class SmsSenderActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (time == 0) {
-                    attendancesCopy = attendanceDao.getFirstTimeAttendancesWithStatus(currentDate, attStatus, msgStatus);
+                    attendancesCopy = attendanceDao.getFirstTimeAttendancesWithStatus(
+                            DateTimeHelper.GetCurrentDate(), attStatus, msgStatus);
                     return null;
                 }
 
-                attendancesCopy = attendanceDao.getSecondTimeAttendancesWithStatus(currentDate, attStatus, msgStatus);
+                attendancesCopy = attendanceDao.getSecondTimeAttendancesWithStatus(
+                        DateTimeHelper.GetCurrentDate(), attStatus, msgStatus);
                 return null;
             }
 
@@ -125,10 +127,10 @@ public class SmsSenderActivity extends AppCompatActivity {
                             sTimeSmsBtn.setClickable(false);
 
                             sentSmsCounter = 0;
-                        }
 
-                        smsCounterText.setText("Pending messages: " + totalMessagesToSent);
-                        sendSMS2();
+                            smsCounterText.setText("Pending messages: " + totalMessagesToSent);
+                            sendSMS2();
+                        }
                         //Toast.makeText(getApplicationContext(), String.valueOf(attendancesCopy.size()), Toast.LENGTH_LONG).show();
                     }
                 });
@@ -213,12 +215,10 @@ public class SmsSenderActivity extends AppCompatActivity {
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(getApplicationContext(), "Network error, try again.", Toast.LENGTH_LONG).show();
+                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                        Toast.makeText(getApplicationContext(), "Failed, try again.", Toast.LENGTH_LONG).show();
                         leftMessages = 0;
                         attendancesCopy.clear();
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        // if phone no is wrong then try on next one;
                         break;
                 }
 
@@ -320,9 +320,9 @@ public class SmsSenderActivity extends AppCompatActivity {
 
         String msgText = "";
 
-        String st1 = "\nTime: (%s) \nDate: (" + tempAttendance.AttDate + ")" +
-                "\n\nThis message has been sent from OXFORD digital attendance system\n" +
-                "Developed by: Asif Nawaz Khan";
+        String st1 = " Time: %s " +
+                "\n\nOXFORD digital attendance system\n" +
+                "Developed by: Asif Nawaz";
 
         String st2 = "Student \"%s\" has entered into the school.";
         String st3 = "Student \"%s\" has left for home.";
@@ -331,9 +331,11 @@ public class SmsSenderActivity extends AppCompatActivity {
         attendancesCopy.remove(0);
 
         if (time == 0) {
-            msgText = String.format(st2, tempAttendance.Name) + String.format(st1, tempAttendance.EntranceTime);
+            msgText = String.format(st2, tempAttendance.Name) +
+                    String.format(st1, tempAttendance.EntranceTime);
         } else {
-            msgText = String.format(st3, tempAttendance.Name) + String.format(st1, tempAttendance.LeaveTime);
+            msgText = String.format(st3, tempAttendance.Name) +
+                    String.format(st1, tempAttendance.LeaveTime);
         }
 
         SmsManager sms = SmsManager.getDefault();

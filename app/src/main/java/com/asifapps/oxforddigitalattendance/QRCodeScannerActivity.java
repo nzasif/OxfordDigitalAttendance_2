@@ -156,7 +156,7 @@ public class QRCodeScannerActivity extends AppCompatActivity {
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
-                        attendance.EntranceTime = currentDate;
+                        attendance.EntranceTime = DateTimeHelper.GetCurrentTime();
 
                         attendanceDao.updateAttendance(attendance);
 
@@ -168,7 +168,7 @@ public class QRCodeScannerActivity extends AppCompatActivity {
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
-                        attendance.LeaveTime = currentDate;
+                        attendance.LeaveTime = DateTimeHelper.GetCurrentTime();
 
                         attendanceDao.updateAttendance(attendance);
 
