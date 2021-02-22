@@ -13,6 +13,11 @@ import com.asifapps.oxforddigitalattendance.Database.Daos.LoginDao;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Admin;
 import com.asifapps.oxforddigitalattendance.Utils.DateTimeHelper;
 
+import java.math.BigInteger;
+import java.security.AlgorithmConstraints;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class LoginActivity extends AppCompatActivity {
 
     LoginDao loginDao;
@@ -51,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             protected Void doInBackground(Void... voids) {
+
                 String n = userName.getText().toString();
                 String p = password.getText().toString();
 

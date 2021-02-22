@@ -215,7 +215,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
                         Toast.makeText(getApplicationContext(), "Failed, try again.", Toast.LENGTH_LONG).show();
                         leftMessages = 0;
                         attendancesCopy.clear();
@@ -327,33 +327,33 @@ public class SmsSenderActivity extends AppCompatActivity {
         String st2 = "Student \"%s\" has entered into the school.";
         String st3 = "Student \"%s\" has left for home.";
 
-        tempAttendance = attendancesCopy.get(0);
-        attendancesCopy.remove(0);
-
-        if (time == 0) {
-            msgText = String.format(st2, tempAttendance.Name) +
-                    String.format(st1, tempAttendance.EntranceTime);
-        } else {
-            msgText = String.format(st3, tempAttendance.Name) +
-                    String.format(st1, tempAttendance.LeaveTime);
-        }
-
-        SmsManager sms = SmsManager.getDefault();
-
-        // ArrayList<String> msgParts = sms.divideMessage(msgText);
-        // msgSize = msgParts.size();
-
-//        ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
-//
-//        for (int i = 0; i < size; i++) {
-//            PendingIntent pi = PendingIntent.getBroadcast(this, i, new Intent(SENT), 0);
-//            pendingIntents.add(pi);
-//        }
-//
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", tempAttendance.AttId), 0);
-//      PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
-
         try {
+            tempAttendance = attendancesCopy.get(0);
+            attendancesCopy.remove(0);
+
+            if (time == 0) {
+                msgText = String.format(st2, tempAttendance.Name) +
+                        String.format(st1, tempAttendance.EntranceTime);
+            } else {
+                msgText = String.format(st3, tempAttendance.Name) +
+                        String.format(st1, tempAttendance.LeaveTime);
+            }
+
+            SmsManager sms = SmsManager.getDefault();
+
+            // ArrayList<String> msgParts = sms.divideMessage(msgText);
+            // msgSize = msgParts.size();
+
+    //        ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
+    //
+    //        for (int i = 0; i < size; i++) {
+    //            PendingIntent pi = PendingIntent.getBroadcast(this, i, new Intent(SENT), 0);
+    //            pendingIntents.add(pi);
+    //        }
+    //
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT).putExtra("attId", tempAttendance.AttId), 0);
+    //      PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+
              sms.sendTextMessage(tempAttendance.Phone, null, msgText, sentPI, null);
             // sms.sendMultipartTextMessage(tempAttendance.Phone, "", msgParts, pendingIntents, null);
         } catch (Exception e) {
