@@ -184,7 +184,14 @@ public class SmsSenderActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                attendanceDao.updateAttendances(attendances);
+                try {
+                    if (attendances.size() > 0)
+                        attendanceDao.updateAttendances(attendances);
+
+                    attendances.clear();
+                } catch (Exception e) {
+                    //
+                }
                 return null;
             }
 
@@ -195,7 +202,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "updated", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "updated", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -207,35 +214,38 @@ public class SmsSenderActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 // int index = intent.getIntExtra("index", -1);
-                int resultCode = getResultCode();
 
-                leftMessages--;
+                if (leftMessages > 0) {
+                    int resultCode = getResultCode();
 
-                switch (resultCode) {
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(getApplicationContext(), "Failed, try again.", Toast.LENGTH_LONG).show();
-                        leftMessages = 0;
-                        attendancesCopy.clear();
-                        break;
-                }
+                    leftMessages--;
 
-                if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_LONG).show();
-
-                    if (time == 0) {
-                        tempAttendance.EntranceMsgSent = true;
-                    } else {
-                        tempAttendance.LeaveMsgSent = true;
+                    switch (resultCode) {
+                        case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                            Toast.makeText(getApplicationContext(), "Failed, try again.", Toast.LENGTH_LONG).show();
+                            leftMessages = 0;
+                            attendancesCopy.clear();
+                            break;
                     }
 
-                    attendances.add(tempAttendance);
-                    sentSmsCounter++;
+                    if (resultCode == Activity.RESULT_OK) {
+
+                        if (time == 0) {
+                            tempAttendance.EntranceMsgSent = true;
+                        } else {
+                            tempAttendance.LeaveMsgSent = true;
+                        }
+
+                        attendances.add(tempAttendance);
+                        sentSmsCounter++;
+                        Toast.makeText(getApplicationContext(), "sent => " + sentSmsCounter, Toast.LENGTH_SHORT).show();
+                    }
                 }
 
-                if (leftMessages <= 0) {
+                if (leftMessages == 0) {
                     messageSendingProcessCompleted();
                 } else {
                     sendSMS2();
