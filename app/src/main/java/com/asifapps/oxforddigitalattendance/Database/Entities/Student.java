@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import java.util.Date;
 
-@Entity(indices = {@Index(value = {"Rno", "Class"})})
+@Entity(indices = {@Index(value = {"Rno", "Class"}, unique = true)})
 public class Student {
     @PrimaryKey(autoGenerate = true)
     public int StdId;

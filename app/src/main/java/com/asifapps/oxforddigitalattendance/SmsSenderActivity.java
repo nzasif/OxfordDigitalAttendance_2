@@ -42,7 +42,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
     SmsManager smsManager;
 
-    BroadcastReceiver smsResult;
+    BroadcastReceiver smsResult = null;
 
     String SENT = "SMS_SENT";
     String DELIVERED = "SMS_DELIVERED";
@@ -51,20 +51,21 @@ public class SmsSenderActivity extends AppCompatActivity {
     Button fTimeSmsBtn;
     Button sTimeSmsBtn;
     ProgressBar progressBar;
-
+    TextView errorText;
     int totalMessagesToSent = 0;
     int leftMessages = 0;
 
     int sentSmsCounter = 0;
 
     Attendance tempAttendance;
-    int msgSize;
+    String errors = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_sender);
         smsCounterText = findViewById(R.id.smsCountText);
+        errorText = findViewById(R.id.error);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
 
@@ -77,7 +78,10 @@ public class SmsSenderActivity extends AppCompatActivity {
         sTimeSmsBtn = findViewById(R.id.sTimeSmsBtn);
         fTimeSmsBtn = findViewById(R.id.fTimeSmsBtn);
 
-        registerBrodcaster();
+        if (smsResult != null) {
+            registerBrodcaster();
+        }
+
 //        sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
 
         // getAttendance(null);
@@ -215,10 +219,22 @@ public class SmsSenderActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 // int index = intent.getIntExtra("index", -1);
 
+                int attId = intent.getIntExtra("attId", -1);
+                boolean dupli = false;
+
+                for (Attendance attendance: attendances) {
+                    if (attendance.AttId == attId) {
+                        dupli = true;
+                        break;
+                    }
+                }
+
+                if (!dupli) {
+                    leftMessages--;
+                }
+
                 if (leftMessages > 0) {
                     int resultCode = getResultCode();
-
-                    leftMessages--;
 
                     switch (resultCode) {
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
@@ -231,7 +247,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                             break;
                     }
 
-                    if (resultCode == Activity.RESULT_OK) {
+                    if (resultCode == Activity.RESULT_OK && !dupli) {
 
                         if (time == 0) {
                             tempAttendance.EntranceMsgSent = true;
@@ -249,64 +265,6 @@ public class SmsSenderActivity extends AppCompatActivity {
                     messageSendingProcessCompleted();
                 } else {
                     sendSMS2();
-                }
-            }
-        };
-
-        getBaseContext().registerReceiver(smsResult, new IntentFilter(SENT));
-    }
-
-    private void registerBrodcaster2() {
-        smsResult = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // int index = intent.getIntExtra("index", -1);
-                int resultCode = getResultCode();
-
-                msgSize--;
-
-                switch (resultCode) {
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(getApplicationContext(), "Network error, try again.", Toast.LENGTH_LONG).show();
-                        leftMessages = 0;
-                        msgSize = 0;
-                        attendancesCopy.clear();
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        msgSize = 0;
-                        // if phone no is wrong then try on next one;
-                        break;
-                }
-
-                if (msgSize <= 0) {
-
-                    leftMessages--;
-
-                    if (resultCode == Activity.RESULT_OK) {
-                        Toast.makeText(getApplicationContext(), "sent", Toast.LENGTH_LONG).show();
-
-                        if (time == 0) {
-                            tempAttendance.EntranceMsgSent = true;
-                        } else {
-                            tempAttendance.LeaveMsgSent = true;
-                        }
-
-                        attendances.add(tempAttendance);
-                        sentSmsCounter++;
-                    }
-
-                    if (resultCode != Activity.RESULT_OK ) {
-                        Toast.makeText(getApplicationContext(), "failed!", Toast.LENGTH_LONG).show();
-                    }
-
-                    if (leftMessages <= 0) {
-                        messageSendingProcessCompleted();
-                    } else {
-                        sendSMS2();
-                    }
-
                 }
             }
         };
@@ -367,7 +325,8 @@ public class SmsSenderActivity extends AppCompatActivity {
              sms.sendTextMessage(tempAttendance.Phone, null, msgText, sentPI, null);
             // sms.sendMultipartTextMessage(tempAttendance.Phone, "", msgParts, pendingIntents, null);
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            errors += "[Name: " + tempAttendance.Name + ", Class: " + tempAttendance.Class + ", Phone: " + tempAttendance.Phone  + "], ";
+            sendSMS2();
         }
     }
 
@@ -377,6 +336,9 @@ public class SmsSenderActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
         fTimeSmsBtn.setClickable(true);
         sTimeSmsBtn.setClickable(true);
+        if (!errors.isEmpty()) {
+            errorText.setText("Failed messages\n" + errors);
+        }
 
         if (attendances.size() != 0) {
             updateSmsStatus();
@@ -386,13 +348,16 @@ public class SmsSenderActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerBrodcaster();
+        if (smsResult != null) {
+            registerBrodcaster();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(smsResult);
+        smsResult = null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
