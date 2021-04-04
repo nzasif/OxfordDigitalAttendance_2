@@ -45,7 +45,7 @@ public class StudentsRecyclerViewAdapter extends RecyclerView.Adapter<StudentsRe
     public void onBindViewHolder(@NonNull StudentViewHolder holder, final int position) {
         Student std = students.get(position);
 
-        holder.setRno(std.Rno);
+        holder.setRno(Integer.toString(std.Rno));
         holder.setName(std.Name);
         holder.setPhone(std.Phone);
 

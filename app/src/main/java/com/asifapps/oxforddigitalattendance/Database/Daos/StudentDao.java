@@ -31,7 +31,7 @@ public interface StudentDao {
     @Query("Select StdId From Student")
     public List<Integer> getAllStudentsId();
 
-    @Query("Select * From Student order by Name ASC")
+    @Query("Select * From Student order by Rno ASC")
     public List<Student> getAllStudents();
 
     @Query("Select * from Student where StdId = :stId")
@@ -40,7 +40,7 @@ public interface StudentDao {
     @Query("Select * from Student where Rno = :rno And Class = :cl")
     public Student getStudent(String rno, String cl);
 
-    @Query("Select * from Student where Class = :Class order by Name ASC")
+    @Query("Select * from Student where Class = :Class order by Rno ASC")
     public List<Student> getStudents(String Class);
 
     @Query("Select StdId From Student where Rno = :rno and Class = :Class")

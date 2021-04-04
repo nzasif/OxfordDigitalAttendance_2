@@ -80,7 +80,7 @@ public class UpdateStudentActivity extends AppCompatActivity implements AdapterV
         phoneView.setText(std.Phone);
 
         rnoView = findViewById(R.id.updateRno);
-        rnoView.setText(std.Rno);
+        rnoView.setText(Integer.toString(std.Rno));
 
         guardView = findViewById(R.id.updateGuard);
         guardView.setText(std.FatherName);
@@ -121,20 +121,14 @@ public class UpdateStudentActivity extends AppCompatActivity implements AdapterV
 
     public void SubmitData(View v) {
         String name = nameView.getText().toString();
-
         String phone = phoneView.getText().toString();
-
-        String rno = rnoView.getText().toString();
-
+        int rno = Integer.parseInt(rnoView.getText().toString());
         String guard = guardView.getText().toString();
-
         String dob = dobView.getText().toString();
-
         String bgroup = bldGroupView.getText().toString();
+        if (rno == 0 || name.isEmpty() || phone.isEmpty() || selectedClass.isEmpty() || guard.isEmpty()) {
 
-        if (rno.isEmpty() || name.isEmpty() || phone.isEmpty() || selectedClass.isEmpty() || guard.isEmpty()) {
-
-            Toast.makeText(this, "Student info should not be empty..", Toast.LENGTH_LONG);
+            Toast.makeText(this, "Student info should not be empty..", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -143,7 +137,7 @@ public class UpdateStudentActivity extends AppCompatActivity implements AdapterV
         student.Class = selectedClass;
         student.DOB = dob;
         student.FatherName = guard;
-        student.Rno = rno;
+        student.Rno =  rno;
         student.Phone = phone;
 
         updateStudent(student);

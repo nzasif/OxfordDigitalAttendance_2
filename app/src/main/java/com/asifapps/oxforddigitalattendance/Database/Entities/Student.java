@@ -11,7 +11,7 @@ public class Student {
     @PrimaryKey(autoGenerate = true)
     public int StdId;
 
-    public String Rno;
+    public int Rno;
     public String Name;
     public String FatherName;
     public String Phone;

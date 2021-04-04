@@ -23,15 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentListActivity extends AppCompatActivity implements IStudentClickEvent, AdapterView.OnItemSelectedListener {
-
     RecyclerView resView;
-
     StudentsRecyclerViewAdapter studentsRecyclerViewAdapter;
-
     private List<Student> studentsList = new ArrayList<Student>();
-
     private String viewingClass = "";
-
     private String[] classes = {"Prep", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "old10th"};
 
     @Override
@@ -47,7 +42,7 @@ public class StudentListActivity extends AppCompatActivity implements IStudentCl
         resView.setLayoutManager(linearLayoutManager);
 
         Student dummyStudent = new Student();
-        dummyStudent.Rno = "-1";
+        dummyStudent.Rno = -1;
 
         studentsList.add(dummyStudent);
 
@@ -107,15 +102,12 @@ public class StudentListActivity extends AppCompatActivity implements IStudentCl
     }
 
     private void setUpStudentList() {
-
         studentsRecyclerViewAdapter = new StudentsRecyclerViewAdapter(this, studentsList);
-
         resView.setAdapter(studentsRecyclerViewAdapter);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override

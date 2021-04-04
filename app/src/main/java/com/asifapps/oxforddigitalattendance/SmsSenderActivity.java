@@ -386,6 +386,9 @@ public class SmsSenderActivity extends AppCompatActivity {
             case R.id.sendSms:
                 startActivity(new Intent(this, SmsSenderActivity.class));
                 break;
+            case R.id.importExport:
+                startActivity(new Intent(this, ImportExport.class));
+                break;
         }
         return true;
     }

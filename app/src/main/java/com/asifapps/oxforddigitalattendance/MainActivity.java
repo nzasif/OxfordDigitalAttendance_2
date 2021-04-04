@@ -109,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.stdEntry:
                 startActivity(new Intent(this, EnterStdRecordActivity.class));
                 break;
+            case R.id.importExport:
+                startActivity(new Intent(this, ImportExport.class));
+                break;
             case R.id.sendSms:
                 startActivity(new Intent(this, SmsSenderActivity.class));
                 break;

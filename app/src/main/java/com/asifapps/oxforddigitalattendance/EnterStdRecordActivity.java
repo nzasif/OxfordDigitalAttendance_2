@@ -117,7 +117,7 @@ public class EnterStdRecordActivity extends AppCompatActivity {
                 Student student = new Student();
 
                 student.Name = name;
-                student.Rno = rno;
+                student.Rno =  Integer.parseInt(rno);;
                 student.Phone = p;
                 student.Class = _cl;
                 student.FatherName = fn;

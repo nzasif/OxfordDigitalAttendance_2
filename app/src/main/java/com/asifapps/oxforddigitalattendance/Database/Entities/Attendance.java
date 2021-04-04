@@ -31,6 +31,6 @@ public class Attendance {
     public int StdId_FK;
     public String Name;
     public String Class;
-    public String Rno;
+    public int Rno;
     public  String Phone;
 }

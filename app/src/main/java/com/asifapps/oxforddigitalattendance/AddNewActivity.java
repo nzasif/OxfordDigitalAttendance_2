@@ -59,7 +59,7 @@ public class AddNewActivity extends AppCompatActivity implements AdapterView.OnI
 
         if (rno.isEmpty() || name.isEmpty() || phone.isEmpty() || selectedClass.isEmpty() || guard.isEmpty()) {
 
-            Toast.makeText(this, "Student info should not be empty..", Toast.LENGTH_LONG);
+            Toast.makeText(this, "Student info should not be empty..", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -70,7 +70,7 @@ public class AddNewActivity extends AppCompatActivity implements AdapterView.OnI
         std.Class = selectedClass;
         std.DOB = dob;
         std.FatherName = guard;
-        std.Rno = rno;
+        std.Rno = Integer.parseInt(rno);
         std.Phone = phone;
 
         insertSudent(std);

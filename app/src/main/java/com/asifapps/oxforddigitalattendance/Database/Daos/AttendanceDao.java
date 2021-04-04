@@ -16,17 +16,17 @@ import java.util.List;
 @Dao
 public interface AttendanceDao {
 
-    @Query("select * from Attendance where AttDate = :date order by Name ASC")
+    @Query("select * from Attendance where AttDate = :date order by Rno ASC")
     public List<Attendance> getAttendances(String date);
 
-    @Query("select * from Attendance order by Name ASC")
+    @Query("select * from Attendance order by Rno ASC")
     public List<Attendance> getAttendances();
 
     @Query("select * from Attendance where AttId = :attId")
     public Attendance getAttendance(Integer attId);
 
     @Query("select * from Attendance" +
-            " where AttDate = :date And Class = :Class And AttStatus = :status order by Name ASC")
+            " where AttDate = :date And Class = :Class And AttStatus = :status order by Rno ASC")
     public List<Attendance> getAttendancesWithStatus(String date, String Class, String status);
 
     @Query("select * from Attendance" +
@@ -45,6 +45,11 @@ public interface AttendanceDao {
             " where Rno = :rno And Class = :Class And AttDate = :date And LeaveTime = '--:--:--'")
     public Attendance getSecondAttendance(String rno, String Class, String date);
 
+    // used in import process
+    @Query("select * from Attendance" +
+            " where Rno = :rno And Class = :Class And AttDate = :date")
+    public Attendance getAttendance(String rno, String Class, String date);
+
     @Insert
     public void insertAttendance(Attendance attendance);
 
@@ -62,4 +67,10 @@ public interface AttendanceDao {
 
     @Query("Update Attendance Set LeaveMsgSent = :msgSent where AttId = :attId")
     public void upadateLeaveMsgSent(int attId, boolean msgSent);
+
+    @Query("Update Attendance Set EntranceTime = :time where Rno = :rno And Class = :cl And AttDate = :date")
+    public void updateEntranceTime(int rno, String cl, String time, String date);
+
+    @Query("Update Attendance Set LeaveTime = :time where Rno = :rno And Class = :cl And AttDate = :date")
+    public void updateLeaveTime(int rno, String cl, String time, String date);
 }
