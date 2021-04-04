@@ -48,7 +48,7 @@ public class AttRecyclerViewAdapter extends RecyclerView.Adapter<AttRecyclerView
 
         holder.name.setText(att.Name);
         holder.phone.setText(att.Phone);
-        holder.rno.setText(att.Rno);
+        holder.rno.setText(Integer.toString(att.Rno));
 
         holder.EntranceTime.setText(att.EntranceTime);
         holder.LeaveTime.setText(att.LeaveTime);
@@ -59,19 +59,19 @@ public class AttRecyclerViewAdapter extends RecyclerView.Adapter<AttRecyclerView
 
             holder.fMsgBtn.setText("alreday sent");
         } else {
-            holder.FirstTimeMsg.setText("1st Time Msg NOT Sent");
+            holder.FirstTimeMsg.setText("1st Time Msg is NOT Sent");
             holder.FirstTimeMsg.setTextColor(Color.RED);
 
             holder.fMsgBtn.setText("Send");
         }
 
         if (att.LeaveMsgSent) {
-            holder.SecondTimeMsg.setText("2nd Time Msg sent");
+            holder.SecondTimeMsg.setText("2nd Time Msg is sent");
             holder.SecondTimeMsg.setTextColor(Color.BLUE);
             holder.sMsgBtn.setText("Sent");
 
         } else {
-            holder.SecondTimeMsg.setText("2nd Time Msg NOT Sent");
+            holder.SecondTimeMsg.setText("2nd Time Msg is NOT Sent");
             holder.SecondTimeMsg.setTextColor(Color.RED);
             holder.sMsgBtn.setText("Send");
         }
@@ -157,10 +157,6 @@ public class AttRecyclerViewAdapter extends RecyclerView.Adapter<AttRecyclerView
 
         public void setName(String name) {
             this.name.setText(name);
-        }
-
-        public void setRno(String rno) {
-            this.rno.setText(rno);
         }
 
         public void setPhone(String phone) {

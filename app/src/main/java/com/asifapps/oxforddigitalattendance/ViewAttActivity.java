@@ -15,6 +15,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,19 +50,13 @@ public class ViewAttActivity extends AppCompatActivity
     String date;
     String _class;
     String attStatus;
-
     String[] classes;
-
     AttendanceDao attendanceDao;
-
     List<Attendance> attendances;
     List<Attendance> attendancesCopy;
-
     AttRecyclerViewAdapter attRecyclerViewAdapter;
-
     TextView attDate;
     RecyclerView resView;
-
     boolean isFirstTime = true;
 
     @Override
@@ -97,6 +94,12 @@ public class ViewAttActivity extends AppCompatActivity
         } catch (Exception e) {
 
         }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
     }
 
     private void setClassSpinner() {
@@ -262,5 +265,32 @@ public class ViewAttActivity extends AppCompatActivity
         savedInstanceState.putString("Class", _class);
         savedInstanceState.putString("attStatus", attStatus);
         savedInstanceState.putString("date", date);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.stdListView:
+                startActivity(new Intent(this, StudentListActivity.class));
+                break;
+            case R.id.addNew:
+                startActivity(new Intent(this, AddNewActivity.class));
+                break;
+            case R.id.cardScanner:
+                startActivity(new Intent(this, QRCodeScannerActivity.class));
+                break;
+            case R.id.viewAtt:
+                startActivity(new Intent(this, ViewAttActivity.class));
+                break;
+            case R.id.stdEntry:
+                startActivity(new Intent(this, EnterStdRecordActivity.class));
+                break;
+            case R.id.importExport:
+                startActivity(new Intent(this, ImportExport.class));
+                break;
+            case R.id.sendSms:
+                startActivity(new Intent(this, SmsSenderActivity.class));
+                break;
+        }
+        return true;
     }
 }

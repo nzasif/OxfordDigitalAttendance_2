@@ -43,6 +43,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
         attendanceDao = AppDb.getDatabase(this).attendanceDao();
 
         setSpinner();
+        filePath = Environment.getExternalStorageDirectory() + "/" + fileNames[0] + ".csv";
     }
 
     private void setSpinner() {
@@ -118,7 +119,6 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
         }
 
         new AsyncTask<Void, Void, Void>() {
-
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
@@ -130,17 +130,17 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                     String nullTime = "--:--:--";
 
                     while ((nextLine = reader.readNext()) != null) {
-                        Attendance attendance = attendanceDao.getAttendance(nextLine[0], nextLine[1], date);
+                        final Attendance attendance = attendanceDao.getAttendance(Integer.parseInt(nextLine[0]), nextLine[1], date);
                         if (attendance == null) {
                             continue;
                         }
 
-                        if (attendance.EntranceTime == nullTime && nextLine[2] != "") {
+                        if (attendance.EntranceTime.equalsIgnoreCase(nullTime) && nextLine[2] != "") {
                             attendance.EntranceTime = nextLine[2];
                             attendance.AttStatus = Constants.pesent;
                         }
 
-                        if (attendance.LeaveTime == nullTime && nextLine[3] != "") {
+                        if (attendance.LeaveTime.equalsIgnoreCase(nullTime) && nextLine[3] != "") {
                             attendance.LeaveTime = nextLine[3];
                             attendance.AttStatus = Constants.pesent;
                         }
@@ -151,7 +151,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "Successfully imported.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Import process completed.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (final Exception e) {
@@ -164,7 +164,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                 }
                 return null;
             }
-        };
+        }.execute();
     }
 
     @Override

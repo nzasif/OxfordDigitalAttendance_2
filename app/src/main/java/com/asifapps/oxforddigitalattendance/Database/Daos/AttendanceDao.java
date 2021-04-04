@@ -47,8 +47,8 @@ public interface AttendanceDao {
 
     // used in import process
     @Query("select * from Attendance" +
-            " where Rno = :rno And Class = :Class And AttDate = :date")
-    public Attendance getAttendance(String rno, String Class, String date);
+            " where Rno = :rno And Class = :cl And AttDate = :date")
+    public Attendance getAttendance(int rno, String cl, String date);
 
     @Insert
     public void insertAttendance(Attendance attendance);

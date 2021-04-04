@@ -78,7 +78,7 @@ public class SmsSenderActivity extends AppCompatActivity {
         sTimeSmsBtn = findViewById(R.id.sTimeSmsBtn);
         fTimeSmsBtn = findViewById(R.id.fTimeSmsBtn);
 
-        if (smsResult != null) {
+        if (smsResult == null) {
             registerBrodcaster();
         }
 
@@ -348,7 +348,7 @@ public class SmsSenderActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (smsResult != null) {
+        if (smsResult == null) {
             registerBrodcaster();
         }
     }
