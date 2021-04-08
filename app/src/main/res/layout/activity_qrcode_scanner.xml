@@ -15,14 +15,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Switch
-            android:id="@+id/switch2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="3sp"
-            android:onClick="selectOld10th"
-            android:text="Old 10th" />
-
         <RadioGroup
             android:id="@+id/attTimeRadio"
             android:layout_width="wrap_content"
@@ -34,8 +26,9 @@
                 android:id="@+id/firstTimeRadio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="First Time"
-                android:onClick="onRadioButtonClicked"/>
+                android:checked="true"
+                android:onClick="onRadioButtonClicked"
+                android:text="First Time" />
 
             <Space
                 android:layout_width="30dp"
@@ -46,8 +39,8 @@
                 android:id="@+id/secTimeRadio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Second Time"
-                android:onClick="onRadioButtonClicked"/>
+                android:onClick="onRadioButtonClicked"
+                android:text="Second Time" />
         </RadioGroup>
 
         <com.journeyapps.barcodescanner.DecoratedBarcodeView

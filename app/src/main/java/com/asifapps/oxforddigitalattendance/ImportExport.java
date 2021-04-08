@@ -30,7 +30,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
 
     String filePath = "";
     String bluetoothPathUpperCase = "Bluetooth";
-    String bluetoothPathLowerCase = "bluetooth";
+    // String bluetoothPathLowerCase = "bluetooth";
 
     private String[] fileNames = {"Oxford_A", "Oxford_B", "Oxford_C", "Oxford_D", "Oxford_E", "Oxford_F", "Oxford_G", "Oxford_H", "Oxford_I", "Oxford_J"};
 
@@ -126,9 +126,9 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    if (impoetTryCount == 2) {
-                        setFilePath("");
-                    }
+//                    if (impoetTryCount == 2) {
+//                        setFilePath("");
+//                    }
 
                     File csvfile = new File(filePath);
                     CSVReader reader = new CSVReader(new FileReader(csvfile.getAbsolutePath()));
@@ -157,7 +157,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                     }
 
                     // if success, set count again for next time
-                    impoetTryCount = 2;
+                    // impoetTryCount = 2;
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -166,28 +166,27 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                         }
                     });
                 } catch (final Exception e) {
-                    impoetTryCount--;
-
-                    switch (impoetTryCount) {
-                        case 1:
-                            setFilePath(bluetoothPathUpperCase);
-                            readAttendanceCSV(null);
-                            break;
-                        case 0:
-                            setFilePath(bluetoothPathLowerCase);
-                            readAttendanceCSV(null);
-                            break;
-                        default:
-                            // reset count for next tryes
-                            impoetTryCount = 2;
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                    }
+//                    impoetTryCount--;
+//
+//                    switch (impoetTryCount) {
+//                        case 1:
+//                            setFilePath(bluetoothPathUpperCase);
+//                            readAttendanceCSV(null);
+//                            break;
+//                        case 0:
+//                            setFilePath(bluetoothPathLowerCase);
+//                            readAttendanceCSV(null);
+//                            break;
+//                        default:
+//                            // reset count for next tryes
+//                            impoetTryCount = 2;
+//                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 return null;
             }
@@ -206,6 +205,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         fileName = fileNames[position];
+        setFilePath(bluetoothPathUpperCase);
     }
 
     @Override

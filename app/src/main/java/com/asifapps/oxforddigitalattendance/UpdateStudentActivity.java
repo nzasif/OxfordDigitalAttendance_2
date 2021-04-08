@@ -18,7 +18,7 @@ import java.security.SecureRandom;
 
 public class UpdateStudentActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private String[] classes = {"1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"};
+    private String[] classes = {"Prep", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"};
     private String selectedClass = "";
 
     private Spinner spinner;

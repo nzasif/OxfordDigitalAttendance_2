@@ -42,10 +42,7 @@ public class EnterStdRecordActivity extends AppCompatActivity {
     private String lastText;
 
     private StudentDao studentDao;
-
     MediaPlayer mediaPlayer = new MediaPlayer();
-
-    boolean isOld10th = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,6 @@ public class EnterStdRecordActivity extends AppCompatActivity {
             }
 
             String codeText = result.getText();
-
             String[] data = QrDecoder.decodeQr(codeText);
 
             if (data != null) {
@@ -102,13 +98,7 @@ public class EnterStdRecordActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... voids) {
 
-                String _cl = cl;
-
-                if (isOld10th) {
-                    _cl = "old10th";
-                }
-
-                Student studentDup = studentDao.getStudent(rno, _cl);
+                Student studentDup = studentDao.getStudent(rno, cl);
 
                 if (studentDup != null) {
                     return null;
@@ -119,7 +109,7 @@ public class EnterStdRecordActivity extends AppCompatActivity {
                 student.Name = name;
                 student.Rno =  Integer.parseInt(rno);;
                 student.Phone = p;
-                student.Class = _cl;
+                student.Class = cl;
                 student.FatherName = fn;
 
                 studentDao.insertStudent(student);
@@ -134,10 +124,6 @@ public class EnterStdRecordActivity extends AppCompatActivity {
     public void playBeep() {
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep2);
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
-    }
-
-    public void selectOld10th(View view) {
-        isOld10th = ((Switch) view).isChecked();
     }
 
     @Override

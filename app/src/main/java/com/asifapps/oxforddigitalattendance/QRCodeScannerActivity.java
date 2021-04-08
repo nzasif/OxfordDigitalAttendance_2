@@ -62,8 +62,6 @@ public class QRCodeScannerActivity extends AppCompatActivity {
 
     private int time = 0;
 
-    boolean isOld10th = false;
-
     private BarcodeCallback callback = new BarcodeCallback() {
 
         @Override
@@ -124,20 +122,14 @@ public class QRCodeScannerActivity extends AppCompatActivity {
             case R.id.firstTimeRadio:
                 if (checked) {
                     time = 0;
-                    Toast.makeText(this, "first", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.secTimeRadio:
                 if (checked) {
                     time = 1;
-                    Toast.makeText(this, "se", Toast.LENGTH_LONG).show();
                 }
                 break;
         }
-    }
-
-    public void selectOld10th(View view) {
-        isOld10th = ((Switch) view).isChecked();
     }
 
     private void takeAtt(final String rno, final String cl) {
@@ -145,14 +137,9 @@ public class QRCodeScannerActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                String _cl = cl;
-
-                if (isOld10th) {
-                    _cl = "old10th";
-                }
 
                 if (time == 0) {
-                    attendance = attendanceDao.getFirstAttendance(rno, _cl, currentDate);
+                    attendance = attendanceDao.getFirstAttendance(rno, cl, currentDate);
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
@@ -164,7 +151,7 @@ public class QRCodeScannerActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    attendance = attendanceDao.getSecondAttendance(rno, _cl, currentDate);
+                    attendance = attendanceDao.getSecondAttendance(rno, cl, currentDate);
 
                     if (attendance != null) {
                         attendance.AttStatus = Constants.pesent;
