@@ -40,8 +40,7 @@ public class SmsSenderActivity extends AppCompatActivity {
     String attStatus = "P";
     List<Attendance> attendancesCopy;
 
-    SmsManager smsManager;
-
+    // SmsManager smsManager;
     BroadcastReceiver smsResult = null;
 
     String SENT = "SMS_SENT";
@@ -218,20 +217,12 @@ public class SmsSenderActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 // int index = intent.getIntExtra("index", -1);
-
-                int attId = intent.getIntExtra("attId", -1);
-                boolean dupli = false;
-
-                for (Attendance attendance: attendances) {
-                    if (attendance.AttId == attId) {
-                        dupli = true;
-                        break;
-                    }
+                if (!intent.getAction().equals(SENT)) {
+                    Toast.makeText(getApplicationContext(), "Noooo sent intent", Toast.LENGTH_LONG).show();
+                    return;
                 }
 
-                if (!dupli) {
-                    leftMessages--;
-                }
+                leftMessages--;
 
                 if (leftMessages > 0) {
                     int resultCode = getResultCode();
@@ -247,7 +238,7 @@ public class SmsSenderActivity extends AppCompatActivity {
                             break;
                     }
 
-                    if (resultCode == Activity.RESULT_OK && !dupli) {
+                    if (resultCode == Activity.RESULT_OK) {
 
                         if (time == 0) {
                             tempAttendance.EntranceMsgSent = true;
@@ -257,7 +248,7 @@ public class SmsSenderActivity extends AppCompatActivity {
 
                         attendances.add(tempAttendance);
                         sentSmsCounter++;
-                        Toast.makeText(getApplicationContext(), "sent => " + sentSmsCounter, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"left = " + leftMessages + ", sent => " + sentSmsCounter, Toast.LENGTH_SHORT).show();
                     }
                 }
 
