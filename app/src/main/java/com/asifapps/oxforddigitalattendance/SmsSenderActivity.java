@@ -99,7 +99,6 @@ public class SmsSenderActivity extends AppCompatActivity {
     }
 
     public void getAttendance() {
-
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -217,6 +216,8 @@ public class SmsSenderActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 // int index = intent.getIntExtra("index", -1);
+                int resultCode = getResultCode();
+
                 if (!intent.getAction().equals(SENT)) {
                     Toast.makeText(getApplicationContext(), "Noooo sent intent", Toast.LENGTH_LONG).show();
                     return;
@@ -225,8 +226,6 @@ public class SmsSenderActivity extends AppCompatActivity {
                 leftMessages--;
 
                 if (leftMessages > 0) {
-                    int resultCode = getResultCode();
-
                     switch (resultCode) {
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
@@ -236,23 +235,23 @@ public class SmsSenderActivity extends AppCompatActivity {
                             leftMessages = 0;
                             attendancesCopy.clear();
                             break;
-                    }
+                        case Activity.RESULT_OK:
+                            if (time == 0) {
+                                tempAttendance.EntranceMsgSent = true;
+                            } else {
+                                tempAttendance.LeaveMsgSent = true;
+                            }
 
-                    if (resultCode == Activity.RESULT_OK) {
-
-                        if (time == 0) {
-                            tempAttendance.EntranceMsgSent = true;
-                        } else {
-                            tempAttendance.LeaveMsgSent = true;
-                        }
-
-                        attendances.add(tempAttendance);
-                        sentSmsCounter++;
-                        Toast.makeText(getApplicationContext(),"left = " + leftMessages + ", sent => " + sentSmsCounter, Toast.LENGTH_SHORT).show();
+                            attendances.add(tempAttendance);
+                            sentSmsCounter++;
+                            Toast.makeText(getApplicationContext(),"sent => " + sentSmsCounter, Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 if (leftMessages == 0) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        sentSmsCounter++;
+                    }
                     messageSendingProcessCompleted();
                 } else {
                     sendSMS2();

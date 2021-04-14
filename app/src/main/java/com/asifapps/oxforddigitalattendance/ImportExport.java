@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     // main app
     AttendanceDao attendanceDao;
     private String fileName;
-    private int impoetTryCount = 2;
+    int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,16 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
 
         setSpinner();
         filePath = Environment.getExternalStorageDirectory() + "/" + fileNames[0] + ".csv";
+
+        Button btn = (Button) findViewById(R.id.clearFilesBtn);
+
+        btn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                clearFiles();
+                return false;
+            }
+        });
     }
 
     private void setSpinner() {
@@ -108,7 +119,7 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "imported successfully.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), Integer.toString(students.size()) + " imported successfully.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -126,9 +137,6 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-//                    if (impoetTryCount == 2) {
-//                        setFilePath("");
-//                    }
 
                     File csvfile = new File(filePath);
                     CSVReader reader = new CSVReader(new FileReader(csvfile.getAbsolutePath()));
@@ -146,41 +154,27 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                         if (attendance.EntranceTime.equalsIgnoreCase(nullTime) && nextLine[2] != "") {
                             attendance.EntranceTime = nextLine[2];
                             attendance.AttStatus = Constants.pesent;
+                            count++;
                         }
 
                         if (attendance.LeaveTime.equalsIgnoreCase(nullTime) && nextLine[3] != "") {
                             attendance.LeaveTime = nextLine[3];
                             attendance.AttStatus = Constants.pesent;
+                            count++;
                         }
 
                         attendanceDao.updateAttendance(attendance);
                     }
 
-                    // if success, set count again for next time
-                    // impoetTryCount = 2;
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "Import process completed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), Integer.toString(count) + " attendances Imported", Toast.LENGTH_SHORT).show();
+                            count = 0;
                         }
                     });
                 } catch (final Exception e) {
-//                    impoetTryCount--;
-//
-//                    switch (impoetTryCount) {
-//                        case 1:
-//                            setFilePath(bluetoothPathUpperCase);
-//                            readAttendanceCSV(null);
-//                            break;
-//                        case 0:
-//                            setFilePath(bluetoothPathLowerCase);
-//                            readAttendanceCSV(null);
-//                            break;
-//                        default:
-//                            // reset count for next tryes
-//                            impoetTryCount = 2;
-//                    }
+                    count = 0;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -191,6 +185,19 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
                 return null;
             }
         }.execute();
+    }
+
+    private void clearFiles() {
+        for (String fName: fileNames) {
+            fileName = fName;
+            setFilePath(bluetoothPathUpperCase);
+            try {
+                File f = new File(filePath);
+                f.delete();
+            } catch (Exception e) {
+            }
+        }
+        Toast.makeText(this, "Cleaned", Toast.LENGTH_SHORT).show();
     }
 
     private void setFilePath(String folderName) {

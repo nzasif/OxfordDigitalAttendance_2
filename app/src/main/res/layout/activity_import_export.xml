@@ -69,6 +69,16 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/clearFilesBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="#C10000"
+            android:text="Clear Files"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+
+        <Button
             android:id="@+id/button7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
