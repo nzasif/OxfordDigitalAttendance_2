@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.asifapps.oxforddigitalattendance.Database.AppDb;
@@ -31,11 +32,12 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
 
     String filePath = "";
     String bluetoothPathUpperCase = "Bluetooth";
+    ArrayList<AttImportLog> attImportLogs = new ArrayList<>();
     // String bluetoothPathLowerCase = "bluetooth";
+    TextView attLogText;
 
-    private String[] fileNames = {"Oxford_A", "Oxford_B", "Oxford_C", "Oxford_D", "Oxford_E", "Oxford_F", "Oxford_G", "Oxford_H", "Oxford_I", "Oxford_J"};
+    private String[] fileNames = {"Cl_Prep", "Cl_1st", "Cl_2nd", "Cl_3rd", "Cl_4th", "Cl_5th", "Cl_6th", "Cl_7th", "Cl_8th", "Cl_9th", "Cl_10th"};
 
-    // main app
     AttendanceDao attendanceDao;
     private String fileName;
     int count = 0;
@@ -44,14 +46,12 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
-
+        attLogText = findViewById(R.id.attImportLog);
         attendanceDao = AppDb.getDatabase(this).attendanceDao();
 
-        setSpinner();
-        filePath = Environment.getExternalStorageDirectory() + "/" + fileNames[0] + ".csv";
+        // setSpinner();
 
         Button btn = (Button) findViewById(R.id.clearFilesBtn);
-
         btn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -61,24 +61,28 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-    private void setSpinner() {
-        Spinner sp = (Spinner) findViewById(R.id.fileNameDropdown);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.dropdown_item, fileNames);
-
-        sp.setAdapter(arrayAdapter);
-        sp.setOnItemSelectedListener(this);
-    }
+    // not used yet
+//    private void setSpinner() {
+//        Spinner sp = (Spinner) findViewById(R.id.fileNameDropdown);
+//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.dropdown_item, fileNames);
+//
+//        sp.setAdapter(arrayAdapter);
+//        sp.setOnItemSelectedListener(this);
+//    }
 
     public void readStudentsCSV(View view) {
-        String stdFile = "ops_std_list.csv";
+        String stdFile = "opsstdlist.csv";
+
+        final ArrayList<Student> students = new ArrayList<>();
+        int counter = 0;
+
         try {
             File csvfile = new File(Environment.getExternalStorageDirectory() + "/" + stdFile);
             CSVReader reader = new CSVReader(new FileReader(csvfile.getAbsolutePath()));
             String[] nextLine;
 
-            final ArrayList<Student> students = new ArrayList<>();
-
             while ((nextLine = reader.readNext()) != null) {
+                counter++;
                 // nextLine[] is an array of values from the line
                 Student std = new Student();
 
@@ -92,13 +96,14 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
             }
 
             insertStudents(students);
-
         } catch (Exception e) {
-            e.printStackTrace();
             Toast.makeText(
                     this,
-                    "The " + stdFile + " file was not found, place this file in root dir of external/internal storage.",
+                    e.getMessage() + " error occurred at line #" + counter,
                     Toast.LENGTH_LONG).show();
+            if (students.size() > 0) {
+                insertStudents(students);
+            }
         }
     }
 
@@ -128,60 +133,85 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void readAttendanceCSV(View view) {
-        if (filePath == "") {
-            Toast.makeText(this, "select a file name then try again.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                try {
+                    for(String fName: fileNames) {
+                        AttImportLog attImportLog = new AttImportLog();
 
-                    File csvfile = new File(filePath);
-                    CSVReader reader = new CSVReader(new FileReader(csvfile.getAbsolutePath()));
-                    String[] nextLine; //Rno, Class, EntranceTime, LeaveTime, AttDate
+                        attImportLog.enterdAttendances = 0;
+                        attImportLog.corruptLineNo = -1;
+                        attImportLog.totalAttendances = 0;
 
-                    String date = DateTimeHelper.GetCurrentDate();
-                    String nullTime = "--:--:--";
+                        try {
+                            filePath = Environment.getExternalStorageDirectory() + "/" + bluetoothPathUpperCase + "/" + fName + ".csv";
+                            File csvfile = new File(filePath);
+                            if (!csvfile.exists()) {
+                                continue;
+                            }
+                            attImportLog.fileName = fName;
 
-                    while ((nextLine = reader.readNext()) != null) {
-                        final Attendance attendance = attendanceDao.getAttendance(Integer.parseInt(nextLine[0]), nextLine[1], date);
-                        if (attendance == null) {
-                            continue;
+                            CSVReader reader = new CSVReader(new FileReader(csvfile.getAbsolutePath()));
+                            String[] nextLine; //Rno, Class, EntranceTime, LeaveTime, AttDate
+
+                            String date = DateTimeHelper.GetCurrentDate();
+                            String nullTime = "--:--:--";
+
+                            while ((nextLine = reader.readNext()) != null) {
+                                final Attendance attendance = attendanceDao.getAttendance(Integer.parseInt(nextLine[0]), nextLine[1], date);
+                                if (attendance == null) {
+                                    continue;
+                                }
+
+                                attImportLog.corruptLineNo++;
+
+                                if (attendance.EntranceTime.equalsIgnoreCase(nullTime) && !nextLine[2].isEmpty()) {
+                                    attendance.EntranceTime = nextLine[2];
+                                    attendance.AttStatus = Constants.pesent;
+
+                                    attImportLog.enterdAttendances++;
+                                }
+
+                                if (attendance.LeaveTime.equalsIgnoreCase(nullTime) && !nextLine[3].isEmpty()) {
+                                    attendance.LeaveTime = nextLine[3];
+                                    attendance.AttStatus = Constants.pesent;
+
+                                    attImportLog.enterdAttendances++;
+                                }
+
+                                attImportLog.totalAttendances++;
+
+                                attendanceDao.updateAttendance(attendance);
+                            }
+                        } catch (final Exception e) {
+                            attImportLog.errorMsg = e.getMessage();
+                        }
+                        attImportLogs.add(attImportLog);
+                        attImportLog = null;
+                    } // for ends
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        StringBuilder text = new StringBuilder();
+                        text.append("Status::\n");
+
+                        for(AttImportLog log: attImportLogs) {
+                            text.append("Class Name: ").append(log.fileName).append("\n")
+                            .append("Total Lines: ").append(log.totalAttendances).append("\n")
+                            .append("Total Entries: ").append(log.enterdAttendances).append("\n")
+                            .append("Errors: ").append(log.errorMsg).append("\n");
+                            if (log.errorMsg != null) {
+                                text.append("Corrupt Line #").append(log.corruptLineNo).append("\n");
+                            }
+                            text.append("-------------\n");
                         }
 
-                        if (attendance.EntranceTime.equalsIgnoreCase(nullTime) && nextLine[2] != "") {
-                            attendance.EntranceTime = nextLine[2];
-                            attendance.AttStatus = Constants.pesent;
-                            count++;
-                        }
-
-                        if (attendance.LeaveTime.equalsIgnoreCase(nullTime) && nextLine[3] != "") {
-                            attendance.LeaveTime = nextLine[3];
-                            attendance.AttStatus = Constants.pesent;
-                            count++;
-                        }
-
-                        attendanceDao.updateAttendance(attendance);
+                        attLogText.setText(text);
+                        attImportLogs.clear();
                     }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), Integer.toString(count) + " attendances Imported", Toast.LENGTH_SHORT).show();
-                            count = 0;
-                        }
-                    });
-                } catch (final Exception e) {
-                    count = 0;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                });
                 return null;
             }
         }.execute();
@@ -218,4 +248,12 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
+}
+
+class AttImportLog {
+    public String errorMsg;
+    public String fileName;
+    public int totalAttendances;
+    public int enterdAttendances;
+    public int corruptLineNo;
 }
