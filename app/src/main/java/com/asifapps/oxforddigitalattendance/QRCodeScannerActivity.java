@@ -28,6 +28,7 @@ import com.asifapps.oxforddigitalattendance.Database.Entities.Attendance;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Student;
 import com.asifapps.oxforddigitalattendance.Utils.Constants;
 import com.asifapps.oxforddigitalattendance.Utils.DateTimeHelper;
+import com.asifapps.oxforddigitalattendance.Utils.PermissionHelper;
 import com.asifapps.oxforddigitalattendance.Utils.QrDecoder;
 import com.asifapps.oxforddigitalattendance.Utils.SmsController;
 import com.google.zxing.BarcodeFormat;
@@ -235,6 +236,21 @@ public class QRCodeScannerActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SmsSenderActivity.class));
                 break;
         }
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkPermissions();
+    }
+
+    private boolean checkPermissions() {
+        if (!PermissionHelper.checkPermissions(this)) {
+            Toast.makeText(this, "Permissions denied.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         return true;
     }
 }

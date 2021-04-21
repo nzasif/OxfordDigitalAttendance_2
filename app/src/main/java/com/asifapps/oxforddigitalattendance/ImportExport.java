@@ -19,6 +19,7 @@ import com.asifapps.oxforddigitalattendance.Database.Entities.Attendance;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Student;
 import com.asifapps.oxforddigitalattendance.Utils.Constants;
 import com.asifapps.oxforddigitalattendance.Utils.DateTimeHelper;
+import com.asifapps.oxforddigitalattendance.Utils.PermissionHelper;
 import com.opencsv.CSVReader;
 
 import java.io.File;
@@ -71,6 +72,9 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
 //    }
 
     public void readStudentsCSV(View view) {
+        if (!checkPermissions()) {
+            return;
+        }
         String stdFile = "opsstdlist.csv";
 
         final ArrayList<Student> students = new ArrayList<>();
@@ -133,6 +137,9 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void readAttendanceCSV(View view) {
+        if (!checkPermissions()) {
+            return;
+        }
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -247,6 +254,21 @@ public class ImportExport extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkPermissions();
+    }
+
+    private boolean checkPermissions() {
+        if (!PermissionHelper.checkPermissions(this)) {
+            Toast.makeText(this, "Permissions denied.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 }
 

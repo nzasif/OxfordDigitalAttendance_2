@@ -23,6 +23,7 @@ import com.asifapps.oxforddigitalattendance.Database.AppDb;
 import com.asifapps.oxforddigitalattendance.Database.Daos.AttendanceDao;
 import com.asifapps.oxforddigitalattendance.Database.Entities.Attendance;
 import com.asifapps.oxforddigitalattendance.Utils.DateTimeHelper;
+import com.asifapps.oxforddigitalattendance.Utils.PermissionHelper;
 import com.asifapps.oxforddigitalattendance.Utils.SmsBroadCastReceiver;
 
 import java.lang.reflect.Array;
@@ -380,6 +381,21 @@ public class SmsSenderActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ImportExport.class));
                 break;
         }
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkPermissions();
+    }
+
+    private boolean checkPermissions() {
+        if (!PermissionHelper.checkPermissions(this)) {
+            Toast.makeText(this, "Permissions denied.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         return true;
     }
 }
